@@ -1,9 +1,6 @@
 - name: install cpanminus
   apt: name=cpanminus state=present
 
-- name: clone a repo somewhere
-  git: repo=https://github.com/alexclear/de-ployka.git dest=/root/de-ployka accept_hostkey=yes
-
 - name: install make
   apt: name=make
 

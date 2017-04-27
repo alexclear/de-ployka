@@ -1,0 +1,7 @@
+- name: clone a repo somewhere
+  git: repo=https://github.com/alexclear/de-ployka.git dest=/root/de-ployka accept_hostkey=yes
+
+- name: build a WAR file
+  shell: cd /root/de-ployka/testwebapp && /opt/maven3/bin/mvn package
+  args:
+    creates: /root/de-ployka/testwebapp/target/testwebapp-1.war
