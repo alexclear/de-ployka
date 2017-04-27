@@ -4,3 +4,6 @@
 [submodule "ansible/roles/java"]
 	path = ansible/roles/java
 	url = https://github.com/kofonfor/ansible-role-java.git
+[submodule "ansible/roles/maven"]
+	path = ansible/roles/maven
+	url = https://github.com/kofonfor/ansible-role-maven.git
