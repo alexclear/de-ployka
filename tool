@@ -22,38 +22,33 @@ my $action = $action_deploy;
 my $application = 'hello-world.war';
 my $timeout = $default_timeout;
 
-my %options = ('config' => \$config,
-               'hostname' => \$hostname,
-               'port' => \$port,
-               'user' => \$user,
-               'password' => \$password,
-               'action' => \$action,
-               'application' => \$application,
-               'timeout' => \$timeout
+my %options = ($Deployka::option_config => \$config,
+               $Deployka::option_hostname => \$hostname,
+               $Deployka::option_port => \$port,
+               $Deployka::option_user => \$user,
+               $Deployka::option_password => \$password,
+               $Deployka::option_action => \$action,
+               $Deployka::option_application => \$application,
+               $Deployka::option_timeout => \$timeout
               );
 
-sub validate_actions {
-    my ($opt_name, $opt_value) = @_;
-    if(!( grep { $_ eq $opt_value } ($action_deploy, $action_start, $action_undeploy) )) {
-        die "valid actions are $action_deploy, $action_start or $action_undeploy";
-    }
-    $action = $opt_value;
-}
-
 GetOptions (\%options, "config=s", "hostname=s", "port=s", "password=s",
-            "action=s", "application=s", "timeout=i")
+            "action=s", "application=s", "timeout=i", "user=s")
 or die "Error in command line arguments\n";
 
-if(!( grep { $_ eq ${$options{'action'}} } ($action_deploy, $action_start, $action_undeploy) )) {
+if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $action_start, $action_undeploy) )) {
     die "valid actions are $action_deploy, $action_start or $action_undeploy";
 }
 
 if ($action eq $action_deploy) {
     print "deploy\n";
+    Deployka::deploy(%options);
 } elsif ($action eq $action_start) {
     print "start\n";
+    Deployka::start(%options);
 } elsif ($action eq $action_undeploy) {
     print "undeploy\n";
+    Deployka::undeploy(%options);
 } else {
     die "This should not be possible!\n";
 }
