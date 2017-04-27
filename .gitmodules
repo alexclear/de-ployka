@@ -1,3 +1,6 @@
 [submodule "ansible/roles/tomcat"]
 	path = ansible/roles/tomcat
 	url = https://github.com/kofonfor/ansible-role-tomcat.git
+[submodule "ansible/roles/java"]
+	path = ansible/roles/java
+	url = https://github.com/kofonfor/ansible-role-java.git
