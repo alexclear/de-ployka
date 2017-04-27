@@ -16,10 +16,21 @@ const my $action_undeploy => "undeploy";
 my $config = '/etc/deployka.yml';
 my $hostname = 'localhost';
 my $port = '8080';
+my $user = '';
 my $password = '';
 my $action = $action_deploy;
 my $application = 'hello-world.war';
 my $timeout = $default_timeout;
+
+my %options = ('config' => \$config,
+               'hostname' => \$hostname,
+               'port' => \$port,
+               'user' => \$user,
+               'password' => \$password,
+               'action' => \$action,
+               'application' => \$application,
+               'timeout' => \$timeout
+              );
 
 sub validate_actions {
     my ($opt_name, $opt_value) = @_;
@@ -29,14 +40,13 @@ sub validate_actions {
     $action = $opt_value;
 }
 
-GetOptions ("config=s" => \$config,
-            "hostname=s" => \$hostname,
-            "port=s" => \$port,
-            "password=s" => \$password,
-            "action=s" => \&validate_actions,
-            "application=s" => \$application,
-            "timeout=i" => \$timeout)
+GetOptions (\%options, "config=s", "hostname=s", "port=s", "password=s",
+            "action=s", "application=s", "timeout=i")
 or die "Error in command line arguments\n";
+
+if(!( grep { $_ eq ${$options{'action'}} } ($action_deploy, $action_start, $action_undeploy) )) {
+    die "valid actions are $action_deploy, $action_start or $action_undeploy";
+}
 
 if ($action eq $action_deploy) {
     print "deploy\n";
