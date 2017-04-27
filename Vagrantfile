@@ -19,4 +19,5 @@ Vagrant.configure(2) do |config|
     ansible.playbook = "ansible/test.yml"
     ansible.sudo = true
   end
+  config.vm.network "forwarded_port", guest: 8080, host: 8089
 end
