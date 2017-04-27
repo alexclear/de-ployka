@@ -11,6 +11,7 @@ use Deployka;
 const my $default_timeout => 10;
 const my $action_deploy => "deploy";
 const my $action_start => "start";
+const my $action_stop => "stop";
 const my $action_undeploy => "undeploy";
 
 my $config = '/etc/deployka.yml';
@@ -36,18 +37,21 @@ GetOptions (\%options, "config=s", "hostname=s", "port=s", "password=s",
             "action=s", "application=s", "timeout=i", "user=s")
 or die "Error in command line arguments\n";
 
-if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $action_start, $action_undeploy) )) {
+if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $action_stop, $action_start, $action_undeploy) )) {
     die "valid actions are $action_deploy, $action_start or $action_undeploy";
 }
 
 if ($action eq $action_deploy) {
-    print "deploy\n";
+    print "deploying\n";
     Deployka::deploy(%options);
+} elsif ($action eq $action_stop) {
+    print "stopping\n";
+    Deployka::stop(%options);
 } elsif ($action eq $action_start) {
-    print "start\n";
+    print "starting\n";
     Deployka::start(%options);
 } elsif ($action eq $action_undeploy) {
-    print "undeploy\n";
+    print "undeploying\n";
     Deployka::undeploy(%options);
 } else {
     die "This should not be possible!\n";
