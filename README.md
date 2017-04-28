@@ -30,3 +30,7 @@ You should set up Vagrant and Ansible on a local machine.
 Vagrant uses Ansible as a provider.     
 Test cases are present in a "deployka" Ansible role and run automatically when Vagrant provisions a host.    
 Perform `vagrant up` to create and start provisioning a box.
+
+## A word on architecture
+
+I do not use OOP, Moose, Mouse, Moo and Moops because this module does not have any internal state. So I decided to keep the number of dependencies to a minimum.
