@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
+no strict 'refs';
 use warnings FATAL => 'all';
 
 use Const::Fast;
@@ -42,21 +43,5 @@ if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $act
     die "valid actions are $action_deploy, $action_start, $action_stop, $action_check or $action_undeploy";
 }
 
-if ($action eq $action_deploy) {
-    print "deploying\n";
-    exit Deployka::deploy(%options);
-} elsif ($action eq $action_stop) {
-    print "stopping\n";
-    exit Deployka::stop(%options);
-} elsif ($action eq $action_start) {
-    print "starting\n";
-    exit Deployka::start(%options);
-} elsif ($action eq $action_check) {
-    print "checking\n";
-    exit Deployka::check(%options);
-} elsif ($action eq $action_undeploy) {
-    print "undeploying\n";
-    exit Deployka::undeploy(%options);
-} else {
-    die "This should not be possible!\n";
-}
+my $sub_name = "Deployka::" . $action;
+exit ($sub_name->(%options));
