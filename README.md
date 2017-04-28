@@ -20,6 +20,7 @@ Valid command line options are:
 - `--application WARFILE` path to an application WAR file
 - `--user USERNAME` a username of a Tomcat management interface user
 - `--password PASSWORD` a password of that user    
+- `--action ACTION` action to perform, valid actions are `deploy`, `stop`, `start`, `undeploy` and `check`, `deploy` implies `start`, the default action is `deploy`
 
 A config file will be updated automatically if you provide a command line parameter other than `--config`.    
 A Tomcat application path is a WAR file name without extension.
