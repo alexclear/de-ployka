@@ -9,7 +9,6 @@ use Getopt::Long;
 use List::Util qw(any);
 use Deployka;
 
-const my $default_timeout => 10;
 const my $action_deploy => "deploy";
 const my $action_start => "start";
 const my $action_stop => "stop";
@@ -17,13 +16,13 @@ const my $action_undeploy => "undeploy";
 const my $action_check => "check";
 
 my $config = '/etc/deployka.yml';
-my $hostname = 'localhost';
-my $port = '8080';
-my $user = '';
-my $password = '';
+my $hostname = undef;
+my $port = undef;
+my $user = undef;
+my $password = undef;
 my $action = $action_deploy;
-my $application = 'hello-world.war';
-my $timeout = $default_timeout;
+my $application = undef;
+my $timeout = undef;
 
 my %options = ($Deployka::option_config => \$config,
                $Deployka::option_hostname => \$hostname,

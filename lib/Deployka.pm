@@ -5,6 +5,7 @@ use warnings;
 use Const::Fast;
 use File::Copy;
 use LWP::UserAgent;
+use YAML ();
 
 our $VERSION = '0.01';
 
@@ -21,29 +22,47 @@ const our $option_password => 'password';
 const our $option_application => 'application';
 const our $option_timeout => 'timeout';
 
+sub _save_config {
+    my ($path, %config) = @_;
+    YAML::DumpFile($path . ".tmp", \%config);
+    # Let's do it atomically!
+    move($path . ".tmp", $path);
+}
+
 sub _parse_config {
     my %options = @_;
     my %config;
+    my $replace_config = 0;
     if((exists $options{$option_config}) && (-f ${$options{$option_config}})) {
-        %config = _load_config(${$options{$option_config}});
+        my $loaded_config = YAML::LoadFile(${$options{$option_config}});
+        $config{$_} = $loaded_config->{$_} for keys %{$loaded_config};
     }
-    if(exists $options{$option_hostname}) {
+    if(exists $options{$option_hostname} && defined ${$options{$option_hostname}}) {
         $config{$option_hostname} = ${$options{$option_hostname}};
+        $replace_config = 1;
     }
-    if(exists $options{$option_port}) {
+    if(exists $options{$option_port} && defined ${$options{$option_port}}) {
         $config{$option_port} = ${$options{$option_port}};
+        $replace_config = 1;
     }
-    if(exists $options{$option_application}) {
+    if(exists $options{$option_application} && defined ${$options{$option_application}}) {
         $config{$option_application} = ${$options{$option_application}};
+        $replace_config = 1;
     }
-    if(exists $options{$option_timeout}) {
+    if(exists $options{$option_timeout} && defined ${$options{$option_timeout}}) {
         $config{$option_timeout} = ${$options{$option_timeout}};
+        $replace_config = 1;
     }
-    if(exists $options{$option_user}) {
+    if(exists $options{$option_user} && defined ${$options{$option_user}}) {
         $config{$option_user} = ${$options{$option_user}};
+        $replace_config = 1;
     }
-    if(exists $options{$option_password}) {
+    if(exists $options{$option_password} && defined ${$options{$option_password}}) {
         $config{$option_password} = ${$options{$option_password}};
+        $replace_config = 1;
+    }
+    if((exists $options{$option_config}) && $replace_config) {
+        _save_config(${$options{$option_config}}, %config);
     }
     return %config;
 }
