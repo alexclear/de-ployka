@@ -63,6 +63,9 @@ sub _parse_config {
         $config{$option_password} = ${$options{$option_password}};
         $replace_config = 1;
     }
+    if((exists $options{$option_config}) && !(-f ${$options{$option_config}}) && !$replace_config) {
+        die "No config file exists and no command line options are set!\n";
+    }
     if((exists $options{$option_config}) && $replace_config) {
         _save_config(${$options{$option_config}}, %config);
     }
@@ -86,7 +89,6 @@ sub deploy {
     close $fh;
     my $response = $ua->put("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/deploy?update=true&path=/testwebapp-1", Content => $content);
     if ($response->is_success) {
-        print("Deployed!\n");
         return 0;
     } else {
         die "Deploying failed: " . $response->status_line . "\n";
@@ -98,7 +100,6 @@ sub undeploy {
     my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/undeploy?path=/testwebapp-1");
     if ($response->is_success) {
-        print("Undeployed!\n");
         return 0;
     } else {
         die "Undeploying failed: " . $response->status_line . "\n";
@@ -110,7 +111,6 @@ sub stop {
     my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/stop?path=/testwebapp-1");
     if ($response->is_success) {
-        print("Stopped!\n");
         return 0;
     } else {
         die "Stopping failed: " . $response->status_line . "\n";
@@ -122,7 +122,6 @@ sub start {
     my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/start?path=/testwebapp-1");
     if ($response->is_success) {
-        print("Started!\n");
         return 0;
     } else {
         die "Starting failed: " . $response->status_line . "\n";
@@ -134,7 +133,6 @@ sub check {
     my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/testwebapp-1/");
     if ($response->is_success) {
-        print("Checked!\n");
         return 0;
     } else {
         return 1;
