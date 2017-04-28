@@ -13,6 +13,7 @@ const my $action_deploy => "deploy";
 const my $action_start => "start";
 const my $action_stop => "stop";
 const my $action_undeploy => "undeploy";
+const my $action_check => "check";
 
 my $config = '/etc/deployka.yml';
 my $hostname = 'localhost';
@@ -37,22 +38,25 @@ GetOptions (\%options, "config=s", "hostname=s", "port=s", "password=s",
             "action=s", "application=s", "timeout=i", "user=s")
 or die "Error in command line arguments\n";
 
-if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $action_stop, $action_start, $action_undeploy) )) {
-    die "valid actions are $action_deploy, $action_start or $action_undeploy";
+if(!( grep { $_ eq ${$options{$Deployka::option_action}} } ($action_deploy, $action_stop, $action_start, $action_check, $action_undeploy) )) {
+    die "valid actions are $action_deploy, $action_start, $action_stop, $action_check or $action_undeploy";
 }
 
 if ($action eq $action_deploy) {
     print "deploying\n";
-    Deployka::deploy(%options);
+    exit Deployka::deploy(%options);
 } elsif ($action eq $action_stop) {
     print "stopping\n";
-    Deployka::stop(%options);
+    exit Deployka::stop(%options);
 } elsif ($action eq $action_start) {
     print "starting\n";
-    Deployka::start(%options);
+    exit Deployka::start(%options);
+} elsif ($action eq $action_check) {
+    print "checking\n";
+    exit Deployka::check(%options);
 } elsif ($action eq $action_undeploy) {
     print "undeploying\n";
-    Deployka::undeploy(%options);
+    exit Deployka::undeploy(%options);
 } else {
     die "This should not be possible!\n";
 }
