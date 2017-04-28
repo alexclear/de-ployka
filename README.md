@@ -14,8 +14,8 @@ Valid command line options are:
 - `--port PORT` a Tomcat port
 - `--application WARFILE` path to an application WAR file
 - `--user USERNAME` a username of a Tomcat management interface user
-- `--password PASSWORD` a password of that user
-A config file will be updated automatically if you provide a command line parameter other than `--config`.
+- `--password PASSWORD` a password of that user    
+A config file will be updated automatically if you provide a command line parameter other than `--config`.    
 A Tomcat application path is a WAR file name without extension.
 
 ## How to test
