@@ -21,11 +21,11 @@ const our $option_password => 'password';
 const our $option_application => 'application';
 const our $option_timeout => 'timeout';
 
-sub parse_config {
+sub _parse_config {
     my %options = @_;
     my %config;
     if((exists $options{$option_config}) && (-f ${$options{$option_config}})) {
-        %config = parse_config(${$options{$option_config}});
+        %config = _load_config(${$options{$option_config}});
     }
     if(exists $options{$option_hostname}) {
         $config{$option_hostname} = ${$options{$option_hostname}};
@@ -48,11 +48,17 @@ sub parse_config {
     return %config;
 }
 
-sub deploy {
-    my %config = parse_config( @_ );
+sub _get_ua {
+    my %config = @_;
     my $ua = LWP::UserAgent->new;
     $ua->timeout($config{$option_timeout});
     $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    return $ua;
+}
+
+sub deploy {
+    my %config = _parse_config( @_ );
+    my $ua = _get_ua(%config);
     open my $fh, '<', $config{$option_application} || die $!;
     binmode $fh;
     my $content = do { local $/; <$fh> };
@@ -67,10 +73,8 @@ sub deploy {
 }
 
 sub undeploy {
-    my %config = parse_config( @_ );
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($config{$option_timeout});
-    $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    my %config = _parse_config( @_ );
+    my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/undeploy?path=/testwebapp-1");
     if ($response->is_success) {
         print("Undeployed!\n");
@@ -81,10 +85,8 @@ sub undeploy {
 }
 
 sub stop {
-    my %config = parse_config( @_ );
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($config{$option_timeout});
-    $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    my %config = _parse_config( @_ );
+    my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/stop?path=/testwebapp-1");
     if ($response->is_success) {
         print("Stopped!\n");
@@ -95,10 +97,8 @@ sub stop {
 }
 
 sub start {
-    my %config = parse_config( @_ );
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($config{$option_timeout});
-    $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    my %config = _parse_config( @_ );
+    my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/start?path=/testwebapp-1");
     if ($response->is_success) {
         print("Started!\n");
@@ -109,9 +109,8 @@ sub start {
 }
 
 sub check {
-    my %config = parse_config( @_ );
-    my $ua = LWP::UserAgent->new;
-    $ua->timeout($config{$option_timeout});
+    my %config = _parse_config( @_ );
+    my $ua = _get_ua(%config);
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/testwebapp-1/");
     if ($response->is_success) {
         print("Checked!\n");
