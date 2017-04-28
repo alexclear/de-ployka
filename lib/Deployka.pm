@@ -108,6 +108,19 @@ sub start {
     }
 }
 
+sub check {
+    my %config = parse_config( @_ );
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout($config{$option_timeout});
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/testwebapp-1/");
+    if ($response->is_success) {
+        print("Checked!\n");
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
 1;
 __END__
 
