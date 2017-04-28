@@ -6,3 +6,44 @@
 
 - name: install deployka Perl module
   cpanm: name=git://github.com/alexclear/de-ployka.git
+
+- name: delete config from a previous test run
+  file: dest=/etc/deployka.yml state=absent
+
+- name: invoke the tool without params
+  shell: /root/de-ployka/tool
+  register: result
+  failed_when: result.rc == 0
+
+- name: invoke the tool with params, save a config, perform a deploy
+  shell: /root/de-ployka/tool --application /root/de-ployka/testwebapp/target/testwebapp-1.war --action deploy --user tomcat --password passw0rd --host localhost --port 8080 --timeout 50
+
+- name: check if the app is deployed
+  shell: /root/de-ployka/tool --action check
+
+- name: stop the app
+  shell: /root/de-ployka/tool --action stop
+
+- name: check if the app is stopped
+  shell: /root/de-ployka/tool --action check
+  register: result
+  failed_when: result.rc == 0
+
+- name: start the app
+  shell: /root/de-ployka/tool --action start
+
+- name: check if the app is started
+  shell: /root/de-ployka/tool --action check
+
+- name: undeploy the app
+  shell: /root/de-ployka/tool --action undeploy
+
+- name: check if the app is undeployed
+  shell: /root/de-ployka/tool --action check
+  register: result
+  failed_when: result.rc == 0
+
+#- name: try to start the app
+#  shell: /root/de-ployka/tool --action start
+#  register: result
+#  failed_when: result.rc == 0
