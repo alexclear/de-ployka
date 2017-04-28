@@ -2,6 +2,11 @@
 
 Deployka is a Perl module which deploys and undeploys a WAR file to/from Tomcat using its management interface
 
+## How to clone a repo
+
+This project uses git submodules, so you should initialize them on running `git clone`:    
+`git clone --recursive https://github.com/alexclear/de-ployka.git`
+
 ## How to use
 
 There is a command line tool called `tool` which uses the Deployka module.    
