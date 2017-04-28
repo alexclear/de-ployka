@@ -53,13 +53,14 @@ sub deploy {
     my $ua = LWP::UserAgent->new;
     $ua->timeout($config{$option_timeout});
     $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
-    open FILE, $config{$option_application} || die $!;
-    binmode FILE;
-    my $content = do { local $/; <FILE> };
-    close FILE;
+    open my $fh, '<', $config{$option_application} || die $!;
+    binmode $fh;
+    my $content = do { local $/; <$fh> };
+    close $fh;
     my $response = $ua->put("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/deploy?update=true&path=/testwebapp-1", Content => $content);
     if ($response->is_success) {
         print("Deployed!\n");
+        return 0;
     } else {
         die "Deploying failed: " . $response->status_line . "\n";
     }
@@ -73,8 +74,37 @@ sub undeploy {
     my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/undeploy?path=/testwebapp-1");
     if ($response->is_success) {
         print("Undeployed!\n");
+        return 0;
     } else {
         die "Undeploying failed: " . $response->status_line . "\n";
+    }
+}
+
+sub stop {
+    my %config = parse_config( @_ );
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout($config{$option_timeout});
+    $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/stop?path=/testwebapp-1");
+    if ($response->is_success) {
+        print("Stopped!\n");
+        return 0;
+    } else {
+        die "Stopping failed: " . $response->status_line . "\n";
+    }
+}
+
+sub start {
+    my %config = parse_config( @_ );
+    my $ua = LWP::UserAgent->new;
+    $ua->timeout($config{$option_timeout});
+    $ua->credentials($config{$option_hostname} . ":" . $config{$option_port}, "Tomcat Manager Application", $config{$option_user}, $config{$option_password});
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/start?path=/testwebapp-1");
+    if ($response->is_success) {
+        print("Started!\n");
+        return 0;
+    } else {
+        die "Starting failed: " . $response->status_line . "\n";
     }
 }
 
