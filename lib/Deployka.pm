@@ -34,7 +34,9 @@ sub _parse_config {
     my %config;
     my $replace_config = 0;
     if((exists $options{$option_config}) && (-f ${$options{$option_config}})) {
-        my $loaded_config = YAML::LoadFile(${$options{$option_config}});
+        my $loaded_config;
+        eval { $loaded_config = YAML::LoadFile(${$options{$option_config}}) };
+        die ${$options{$option_config}} . " is not in correct YAML format!\n" if $@;
         $config{$_} = $loaded_config->{$_} for keys %{$loaded_config};
     }
     if(exists $options{$option_hostname} && defined ${$options{$option_hostname}}) {
