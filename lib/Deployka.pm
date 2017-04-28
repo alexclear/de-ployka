@@ -6,6 +6,7 @@ use Const::Fast;
 use File::Copy;
 use LWP::UserAgent;
 use YAML ();
+use File::Basename;
 
 our $VERSION = '0.01';
 
@@ -20,6 +21,7 @@ const our $option_port => 'port';
 const our $option_user => 'user';
 const our $option_password => 'password';
 const our $option_application => 'application';
+const our $option_path => 'path';
 const our $option_timeout => 'timeout';
 
 sub _save_config {
@@ -69,6 +71,10 @@ sub _parse_config {
     if((exists $options{$option_config}) && $replace_config) {
         _save_config(${$options{$option_config}}, %config);
     }
+    if(!(exists $config{$option_application} && defined $config{$option_application})) {
+        die "Please provide a path to an application file!\n";
+    }
+    ($config{$option_path} = basename($config{$option_application})) =~ s/\.[^.]+$//;
     return %config;
 }
 
@@ -87,7 +93,7 @@ sub deploy {
     binmode $fh;
     my $content = do { local $/; <$fh> };
     close $fh;
-    my $response = $ua->put("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/deploy?update=true&path=/testwebapp-1", Content => $content);
+    my $response = $ua->put("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/deploy?update=true&path=/" . $config{$option_path}, Content => $content);
     if ($response->is_success) {
         return 0;
     } else {
@@ -98,7 +104,7 @@ sub deploy {
 sub undeploy {
     my %config = _parse_config( @_ );
     my $ua = _get_ua(%config);
-    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/undeploy?path=/testwebapp-1");
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/undeploy?path=/" . $config{$option_path});
     if ($response->is_success) {
         return 0;
     } else {
@@ -109,7 +115,7 @@ sub undeploy {
 sub stop {
     my %config = _parse_config( @_ );
     my $ua = _get_ua(%config);
-    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/stop?path=/testwebapp-1");
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/stop?path=/" . $config{$option_path});
     if ($response->is_success) {
         return 0;
     } else {
@@ -120,7 +126,7 @@ sub stop {
 sub start {
     my %config = _parse_config( @_ );
     my $ua = _get_ua(%config);
-    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/start?path=/testwebapp-1");
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/manager/text/start?path=/" . $config{$option_path});
     if ($response->is_success) {
         return 0;
     } else {
@@ -131,7 +137,7 @@ sub start {
 sub check {
     my %config = _parse_config( @_ );
     my $ua = _get_ua(%config);
-    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/testwebapp-1/");
+    my $response = $ua->get("http://" . $config{$option_hostname} . ":" . $config{$option_port} . "/" . $config{$option_path} . "/");
     if ($response->is_success) {
         return 0;
     } else {
